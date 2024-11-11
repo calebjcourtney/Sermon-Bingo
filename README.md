@@ -1,2 +1,2 @@
 # Sermon-Bingo
-Pulls the latest sermon notes from Doug Wilson's site and outputs a Bingo Card
+Pulls the latest sermon notes from a given website and outputs a Bingo Card for most commonly used words in the notes.
