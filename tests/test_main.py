@@ -62,22 +62,35 @@ def test_dedupe_words_with_same_stems(words, expected):
 @pytest.mark.parametrize(
     "words, count, expected",
     [
-        (["hello", "world", "hello", "world"], 2, [["hello", "world"], ["hello", "world"]]),
-        (["hello", "world", "hello", "world"], 3, [["hello", "world", "hello"], ["world"]]),
-    ]
+        (
+            ["hello", "world", "hello", "world"],
+            2,
+            [["hello", "world"], ["hello", "world"]],
+        ),
+        (
+            ["hello", "world", "hello", "world"],
+            3,
+            [["hello", "world", "hello"], ["world"]],
+        ),
+    ],
 )
 def test_arrange_into_sublists(words, count, expected):
     assert _arrange_into_sublists(words, count) == expected
 
+
 @pytest.mark.parametrize(
     "words, limit, expected",
     [
-        (["a", "the", "hello", "world"], None, ["a", "the", "hello", "world"]), # default behavior
+        (
+            ["a", "the", "hello", "world"],
+            None,
+            ["a", "the", "hello", "world"],
+        ),  # default behavior
         (["a", "the", "hello", "world"], 1, ["a", "", "hello", "world"]),
         (["a", "the", "hello", "world"], 2, ["", "", "hello", "world"]),
         (["a", "the", "hello", "world"], 3, ["", "", "hello", ""]),
         (["a", "the", "hello", "world"], 4, ["", "", "", ""]),
-    ]
+    ],
 )
 def test_replace_common_words_with_blanks(words, limit, expected):
     assert _replace_common_words_with_blanks(words, limit) == expected
@@ -90,29 +103,29 @@ def test_parse_words(response):
         flattened |= set(words)
 
     assert flattened == {
-        'fortune',
-        'say',
-        'sleep',
-        '',
-        'arrows',
-        'opposing',
-        'suffer',
-        'end',
-        'nobler',
-        'bear',
-        'slings',
-        'arms',
-        'sea',
-        'troubles',
-        'outrageous',
-        'Thus',
-        'death',
-        'dieto',
-        'mind',
-        'tis',
-        'makes',
-        'question',
-        'Whether',
+        "fortune",
+        "say",
+        "sleep",
+        "",
+        "arrows",
+        "opposing",
+        "suffer",
+        "end",
+        "nobler",
+        "bear",
+        "slings",
+        "arms",
+        "sea",
+        "troubles",
+        "outrageous",
+        "Thus",
+        "death",
+        "dieto",
+        "mind",
+        "tis",
+        "makes",
+        "question",
+        "Whether",
     }
 
 
@@ -121,8 +134,12 @@ def test_main(response):
     mock_args.url = "https://google.com"
     mock_args.empty_boxes = 3
     with (
-        patch("src.sermon_bingo.__main__._parse_args", return_value=mock_args) as mock_parse_args,
-        patch("src.sermon_bingo.__main__._download_sermon", return_value=response) as mock_download_sermon,
+        patch(
+            "src.sermon_bingo.__main__._parse_args", return_value=mock_args
+        ) as mock_parse_args,
+        patch(
+            "src.sermon_bingo.__main__._download_sermon", return_value=response
+        ) as mock_download_sermon,
         patch("src.sermon_bingo.__main__._save_to_pdf") as mock_save_to_pdf,
     ):
         main()

@@ -39,5 +39,5 @@ jobs:
       - name: Run tests
         run: poetry run pytest
 
-      - name: Lint
-        run: poetry run pylint $(git ls-files '*.py')
+      - name: Black
+        run: poetry run black $(git ls-files '*.py')
