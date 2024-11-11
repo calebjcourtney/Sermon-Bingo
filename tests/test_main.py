@@ -6,7 +6,7 @@ from src.sermon_bingo.__main__ import _dedupe_words_with_same_stems
 from src.sermon_bingo.__main__ import _arrange_into_sublists
 from src.sermon_bingo.__main__ import _replace_common_words_with_blanks
 from src.sermon_bingo.__main__ import _parse_words
-from src.sermon_bingo.__main__ import main
+from src.sermon_bingo.__main__ import _main
 
 
 @pytest.fixture
@@ -142,7 +142,7 @@ def test_main(response):
         ) as mock_download_sermon,
         patch("src.sermon_bingo.__main__._save_to_pdf") as mock_save_to_pdf,
     ):
-        main()
+        _main()
 
     mock_parse_args.assert_called_once()
     mock_download_sermon.assert_called_once_with(mock_args.url)
