@@ -2,11 +2,11 @@ from unittest.mock import MagicMock
 from unittest.mock import patch
 import pytest
 
-from src.sermon_bingo.__main__ import _dedupe_words_with_same_stems
-from src.sermon_bingo.__main__ import _arrange_into_sublists
-from src.sermon_bingo.__main__ import _replace_common_words_with_blanks
-from src.sermon_bingo.__main__ import _parse_words
-from src.sermon_bingo.__main__ import _main
+from sermon_bingo.__main__ import _dedupe_words_with_same_stems
+from sermon_bingo.__main__ import _arrange_into_sublists
+from sermon_bingo.__main__ import _replace_common_words_with_blanks
+from sermon_bingo.__main__ import _parse_words
+from sermon_bingo.__main__ import _main
 
 
 @pytest.fixture
@@ -135,12 +135,12 @@ def test_main(response):
     mock_args.empty_boxes = 3
     with (
         patch(
-            "src.sermon_bingo.__main__._parse_args", return_value=mock_args
+            "sermon_bingo.__main__._parse_args", return_value=mock_args
         ) as mock_parse_args,
         patch(
-            "src.sermon_bingo.__main__._download_sermon", return_value=response
+            "sermon_bingo.__main__._download_sermon", return_value=response
         ) as mock_download_sermon,
-        patch("src.sermon_bingo.__main__._save_to_pdf") as mock_save_to_pdf,
+        patch("sermon_bingo.__main__._save_to_pdf") as mock_save_to_pdf,
     ):
         _main()
 
