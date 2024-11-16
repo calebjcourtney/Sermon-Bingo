@@ -25,6 +25,7 @@ CUSTOM_WORDS = set(
         "us",
         "this",
         "said",
+        "ye",
     ]
 )
 
