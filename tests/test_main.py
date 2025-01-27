@@ -1,3 +1,5 @@
+from tempfile import NamedTemporaryFile
+
 from unittest.mock import MagicMock
 from unittest.mock import patch
 import pytest
@@ -5,7 +7,8 @@ import pytest
 from sermon_bingo.__main__ import _dedupe_words_with_same_stems
 from sermon_bingo.__main__ import _arrange_into_sublists
 from sermon_bingo.__main__ import _replace_common_words_with_blanks
-from sermon_bingo.__main__ import _parse_words
+from sermon_bingo.__main__ import _parse_html
+from sermon_bingo.__main__ import _parse_text
 from sermon_bingo.__main__ import _main
 
 
@@ -46,6 +49,11 @@ def response():
     <p>With this regard their currents turn awry</p>
     <p>And lose the name of action.</p>
     """
+
+
+@pytest.fixture
+def clean_response(response):
+    return response.replace("<p>", "").replace("</p>", "")
 
 
 @pytest.mark.parametrize(
@@ -96,17 +104,13 @@ def test_replace_common_words_with_blanks(words, limit, expected):
     assert _replace_common_words_with_blanks(words, limit) == expected
 
 
-def test_parse_words(response):
-    grouped_words = _parse_words(response, 3)
-    flattened = set()
-    for words in grouped_words:
-        flattened |= set(words)
+def test_parse_html(response):
+    words = set(_parse_html(response))
 
-    assert flattened == {
+    expected = {
         "fortune",
         "say",
         "sleep",
-        "",
         "arrows",
         "opposing",
         "suffer",
@@ -128,11 +132,44 @@ def test_parse_words(response):
         "Whether",
     }
 
+    assert words & expected == expected
 
-def test_main(response):
+
+def test_parse_text(clean_response):
+    words = set(_parse_text(clean_response))
+    expected = {
+        "fortune",
+        "say",
+        "sleep",
+        "arrows",
+        "opposing",
+        "suffer",
+        "end",
+        "nobler",
+        "bear",
+        "slings",
+        "arms",
+        "sea",
+        "troubles",
+        "outrageous",
+        "Thus",
+        "death",
+        "dieto",
+        "mind",
+        "tis",
+        "makes",
+        "question",
+        "Whether",
+    }
+
+    assert words & expected == expected
+
+
+def test_main_url(response):
     mock_args = MagicMock()
     mock_args.url = "https://google.com"
     mock_args.empty_boxes = 3
+    mock_args.text_file = None
     with (
         patch(
             "sermon_bingo.__main__._parse_args", return_value=mock_args
@@ -146,4 +183,29 @@ def test_main(response):
 
     mock_parse_args.assert_called_once()
     mock_download_sermon.assert_called_once_with(mock_args.url)
+    mock_save_to_pdf.assert_called_once()
+
+
+def test_main_text_file(clean_response):
+    with NamedTemporaryFile() as fp:
+        fp.write(b"Hello World!")
+        mock_args = MagicMock()
+        mock_args.url = None
+        mock_args.empty_boxes = 3
+        mock_args.text_file = fp.name
+
+        with (
+            patch(
+                "sermon_bingo.__main__._parse_args", return_value=mock_args
+            ) as mock_parse_args,
+            patch(
+                "sermon_bingo.__main__._download_sermon", return_value=response
+            ) as mock_download_sermon,
+            patch("sermon_bingo.__main__._save_to_pdf") as mock_save_to_pdf,
+
+        ):
+            _main()
+
+    mock_parse_args.assert_called_once()
+    mock_download_sermon.assert_not_called()
     mock_save_to_pdf.assert_called_once()
