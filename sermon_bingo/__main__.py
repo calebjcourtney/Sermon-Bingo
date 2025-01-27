@@ -26,6 +26,13 @@ CUSTOM_WORDS = set(
         "this",
         "said",
         "ye",
+        "thing",
+        "without",
+        "things",
+        "blaspheming",
+        "blaspheme",
+        "tis",
+        "te"
     ]
 )
 
@@ -89,24 +96,38 @@ def _replace_common_words_with_blanks(words, limit=3):
     return output
 
 
-def _parse_words(text: str, limit: int) -> list[list[str]]:
+def _parse_html(text: str) -> list[str]:
     soup = BeautifulSoup(text, "html.parser")
 
     words = "\n".join(x.get_text() for x in soup.find_all("p")).split()
     words = ["".join(char for char in word if char.isalpha()) for word in words]
 
+    words = ["".join(char for char in word if char.isalpha()) for word in words]
+
+    return words
+
+
+def _parse_text(text: str) -> list[str]:
+    words = text.split()
+    words = ["".join(char for char in word if char.isalpha()) for word in words]
+
+    return words
+
+
+def _group_words(words: list[str], limit: int) -> list[list[str]]:
     counter = _dedupe_words_with_same_stems(words)
 
-    common_sermon_words = [word for word, _ in counter.most_common(25)]
+    common_sermon_words = [word for word, _ in counter.most_common(9)]
     random.shuffle(common_sermon_words)
     common_sermon_words = _replace_common_words_with_blanks(common_sermon_words, limit)
-    grouped_words = _arrange_into_sublists(common_sermon_words, 5)
+    grouped_words = _arrange_into_sublists(common_sermon_words, 3)
 
     return grouped_words
 
 
 def _save_to_pdf(data):
-    fig, ax = plt.subplots(figsize=(5, 5))
+    print(data)
+    fig, ax = plt.subplots(figsize=(3, 3))
     ax.axis("off")
     # Create the table
     the_table = ax.table(cellText=data, loc="center", cellLoc="center")
@@ -130,8 +151,9 @@ def _save_to_pdf(data):
 
 def _parse_args():
     argument_parser = ArgumentParser()
-    argument_parser.add_argument("url")
-    argument_parser.add_argument("--empty-boxes", type=int, default=3)
+    argument_parser.add_argument("--url", type=str)
+    argument_parser.add_argument("--empty-boxes", type=int, default=2)
+    argument_parser.add_argument("--text-file", type=str)
     args = argument_parser.parse_args()
 
     return args
@@ -139,8 +161,16 @@ def _parse_args():
 
 def _main():
     args = _parse_args()
-    text = _download_sermon(args.url)
-    grouped_words = _parse_words(text, args.empty_boxes)
+    if args.text_file:
+        text = open(args.text_file, "r").read()
+        words = _parse_text(text)
+    elif args.url:
+        html = _download_sermon(args.url)
+        words = _parse_html(html)
+    else:
+        raise ValueError("Must have one of text_file or url in command line input")
+
+    grouped_words = _group_words(words, args.empty_boxes)
     _save_to_pdf(grouped_words)
 
 
