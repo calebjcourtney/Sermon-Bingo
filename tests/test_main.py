@@ -202,7 +202,6 @@ def test_main_text_file(clean_response):
                 "sermon_bingo.__main__._download_sermon", return_value=response
             ) as mock_download_sermon,
             patch("sermon_bingo.__main__._save_to_pdf") as mock_save_to_pdf,
-
         ):
             _main()
 

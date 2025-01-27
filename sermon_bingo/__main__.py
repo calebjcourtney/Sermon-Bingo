@@ -32,7 +32,7 @@ CUSTOM_WORDS = set(
         "blaspheming",
         "blaspheme",
         "tis",
-        "te"
+        "te",
     ]
 )
 
